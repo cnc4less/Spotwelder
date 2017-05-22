@@ -94,7 +94,7 @@ void selectContinuously()
 
 void TFTinit()
 { tft.begin();
-  tft.setOrientation(2);
+  tft.setOrientation(eeprom.readInt(orientation)); 
   tft.setFont(Terminal12x16);
 }
 
@@ -109,4 +109,13 @@ void printValuesToSerial()
 {  Serial << "\npreweld " << menuItems[0].upDownVal << "ms, pause " << menuItems[1].upDownVal << "ms, weldTime " 
    << menuItems[2].upDownVal << "ms, continuously " << continuously << endl;
 }
+
+void setOrientation()
+{ pollAll(); // works without too
+  if(upButton.on() && downButton.on()) 
+  { if(eeprom.readInt(orientation)==0) eeprom.writeInt(orientation, 2); 
+    else eeprom.writeInt(orientation, 0); 
+  }
+}
+
 

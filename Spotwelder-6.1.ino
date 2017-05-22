@@ -1,7 +1,7 @@
 bool sinMaxDisabled = 0; // for test without transformer, must be 0
 
 /* 
-Note: use the latest Arduino software and install the 3 libraries.
+Note: use the latest Arduino software and install the libraries.
 
 Arduino spot welder controller
 http://www.avdweb.nl/arduino/hardware-interfacing/spot-welder-controller.html
@@ -49,6 +49,7 @@ Eeprom eeprom;
 
 bool TFTused;  
 bool continuously;
+unsigned orientation;
 
 void setup() 
 { Serial.begin(9600);
@@ -56,7 +57,8 @@ void setup()
   eeprom.read(); 
   setpinModes();
   TFTused = TFTusedJumper();  
-  if(TFTused) TFTinit();  
+  setOrientation(); // after eeprom.init()
+  if(TFTused) TFTinit();
   if(!TFTused) blinkLed(4);  
   digitalWrite(ledPin, 1); // power on indication   
   selectContinuously();  
