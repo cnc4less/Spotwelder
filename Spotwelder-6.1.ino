@@ -13,6 +13,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License at http://www.gnu.org/licenses .
 Version 5.2 1-02-2015
 Version 6.0 2-01-2017 added menu with TFT display
+Version 6.1 22-05-2017 added set display orientation
 
 Program with FTDI programmer, Extra > Board > Arduino Uno
 
