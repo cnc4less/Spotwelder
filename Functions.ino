@@ -6,7 +6,10 @@ void weldControlNoTFT()
 
 void weldControlTFT()
 { //if(continuously && BCDswitch()==0) weld(weldButton.on()); 
-  if(continuously) weld(weldButton.on()); 
+  if(continuously)
+  {
+     weld(weldButton.on());
+  }
   else
   if(weldButton.pushed()) weldCyclus(menuItems[2].upDownVal); 
 }
@@ -38,8 +41,19 @@ void pulseWeld(int ms)
 }
 
 void weld(bool b) 
-{ digitalWrite(weldPin, b);
+{
+  if (b)
+     menu.displayDot(1); // Indicates thyristors are on
+  else
+     menu.displayDot(0); // Indicates thyristors are off
+  
+  if (b && !PrevWeld && !sinMaxDisabled) // If it is the first weld button press,
+     sinusMax();                       //  waits for voltage sinus max
+     
+  digitalWrite(weldPin, b);
   digitalWrite(ledPin, !b);
+  
+  PrevWeld = b;
 }
 
 void sinusMax()
@@ -98,9 +112,10 @@ void TFTinit()
   tft.setFont(Terminal12x16);
 }
 
+// Detects if old (no LCD) or new (with LCD) PCB is being used
 bool TFTusedJumper()  
-{ pinMode(tftJumperOutPin, OUTPUT);
-  pinMode(tftJumperInPin, INPUT_PULLUP); // default 1
+{ pinMode(tftJumperOutPin, OUTPUT); // Defines this pin as bein an output
+  pinMode(tftJumperInPin, INPUT_PULLUP); // Defines this pin as being an input with a pull-up resistor
   digitalWrite(tftJumperOutPin, 0);
   return !digitalRead(tftJumperInPin); // no jumper = 1 (compatible with old software)
 }
@@ -110,6 +125,7 @@ void printValuesToSerial()
    << menuItems[2].upDownVal << "ms, continuously " << continuously << endl;
 }
 
+// LCD Orientation can only be either 0 or 2
 void setOrientation()
 { pollAll(); // works without too
   if(upButton.on() && downButton.on()) 

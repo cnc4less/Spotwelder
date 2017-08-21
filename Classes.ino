@@ -48,20 +48,24 @@ void Menu::displayAll()
       displayName(upDownItemNr, menuItems[upDownItemNr].name); 
       menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 0, 0);
      } 
-    upDownItemNr.value=0;
+    upDownItemNr.value = 0;
     menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 1, 0); // item 0 has focus
     displayDot(0); 
     drawColorTextLine(10, 0, "-   +   sel   weld", COLOR_YELLOW, COLOR_BLUEVIOLET);
+    // drawColorTextLine(10, 0, "Weld Sel Up Down", COLOR_YELLOW, COLOR_BLUEVIOLET);
   }
   else 
   { drawColorTextLine(4, 0, "  Continuously", COLOR_WHITE, COLOR_RED);
     drawColorTextLine(5, 0, "        mode", COLOR_WHITE, COLOR_RED);
     drawColorTextLine(6, 0, "    Take care!", COLOR_WHITE, COLOR_RED);
+    // drawColorTextLine(10, 0, "Weld           ", COLOR_YELLOW, COLOR_BLUEVIOLET);
+    drawColorTextLine(10, 0, "           Weld", COLOR_YELLOW, COLOR_BLUEVIOLET);
   }
 }
 
 void Menu::displayDot(bool on)
-{ tft.fillCircle(87, 170, 12, on? COLOR_WHITE : COLOR_DARKBLUE); 
+// { tft.fillCircle(87, 170, 12, on? COLOR_WHITE : COLOR_DARKBLUE); 
+{ tft.fillCircle(87, 170, 12, on? COLOR_RED : COLOR_DARKGREEN); 
 }
 
 void Menu::displayName(int upDownItemNr, String &name) 
@@ -70,8 +74,8 @@ void Menu::displayName(int upDownItemNr, String &name)
 
 void Menu::displayValue(int upDownItemNr, int value, bool focus, bool background)
 { menu.drawColorTextLine(2*upDownItemNr+1, txtLeft, String("      ")); // clear line
-  menu.drawColorTextLine(2*upDownItemNr+1, 0, focus? ">" : " ", TXT_COLOR);
-  menu.drawColorTextLine(2*upDownItemNr+1, txtLeft, String(value), background? COLOR_BLACK : TXT_COLOR, background? COLOR_CYAN : COLOR_BLACK);
+  menu.drawColorTextLine(2*upDownItemNr+1, 0, focus? ">" : " ", TXT_COLOR1);
+  menu.drawColorTextLine(2*upDownItemNr+1, txtLeft, String(value), background? COLOR_BLACK : TXT_COLOR1, background? COLOR_CYAN : COLOR_BLACK);
 }
 
 // ---------------------------------------------------------------------------
@@ -82,11 +86,13 @@ value(value), step(step), minValue(minValue), maxValue(maxValue)
 }
 int UpDownValue::up() 
 { value += step;       
-  return value = min(max(value, minValue), maxValue);
+  // return value = min(max(value, minValue), maxValue);
+  return value = (value > maxValue) ?  minValue : value;
 }
 int UpDownValue::down() 
 { value -= step;       
-  return value = min(max(value, minValue), maxValue);
+  // return value = min(max(value, minValue), maxValue);
+  return value = (value < minValue ) ?  maxValue : value;
 }
 
 UpDownValue::operator int() // conversion operator, object returns value
