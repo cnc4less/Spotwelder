@@ -1,5 +1,5 @@
 // Warning, set sinMaxDisabled = 0 for the production firmware
-bool sinMaxDisabled = 0; // Set this 0 for testing without transformer
+bool sinMaxDisabled = 1; // Set this 0 for testing without transformer
 
 /* 
 Note: use the latest Arduino software and install the libraries.
@@ -50,7 +50,7 @@ TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RSTpin, TFT_RSpin, TFT_CSpin, 0); // har
 // Defines the main menu entry names/items
 MenuItem preweldTimeItem = MenuItem("Preweld, ms", UpDownValue(50, 50, 0, 1000)); // value, step, minValue, maxValue
 MenuItem pauseTimeItem = MenuItem("Pause, ms", UpDownValue(500, 50, 0, 1000)); 
-MenuItem weldTimeItem = MenuItem("Weld time, ms", UpDownValue(250, 50, 50, 1000));
+MenuItem weldTimeItem = MenuItem("Weld time, ms", UpDownValue(250, 50, 0, 1000));
 MenuItem menuItems[] = {preweldTimeItem, pauseTimeItem, weldTimeItem};
 UpDownValue upDownItemNr = UpDownValue(0, 1, 0, 2); // 3 items 0 1 2 
 Menu menu; 
@@ -58,7 +58,7 @@ Eeprom eeprom;
 
 bool TFTused;  
 bool continuously;
-bool PrevWeld;
+//bool PrevWeld;
 unsigned orientation;
 
 void setup() 
@@ -77,11 +77,7 @@ void setup()
   digitalWrite(ledPin, 1); // power on indication   
   selectContinuously();  
   printValuesToSerial();
-  if(TFTused)
-  { menu.displayName(0, version);
-    delay(500);
-    menu.displayAll();
-  }
+  if(TFTused) menu.displayAll();
 }
   
 void loop() 
@@ -92,3 +88,4 @@ void loop()
   } else 
   weldControlNoTFT();
 }
+
