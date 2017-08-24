@@ -5,23 +5,17 @@ void weldControlNoTFT()
 }
 
 void weldControlTFT()
-{ //if(continuously && BCDswitch()==0) weld(weldButton.on()); 
-  if(continuously)
-  {
-     weld(weldButton.on());
-  }
+{ if(continuously) weld(weldButton.on());
   else
   if(weldButton.pushed()) weldCyclus(menuItems[2].upDownVal); 
 }
   
 void weldCyclus(int weldTime_ms)
 { if(!sinMaxDisabled) sinusMax();
-  if(TFTused) menu.displayDot(1); // just once per weld cyclus
   pulseWeld(menuItems[0].upDownVal);
   delay(menuItems[1].upDownVal);
   if(!sinMaxDisabled) sinusMax();
   pulseWeld(weldTime_ms);
-  if(TFTused) menu.displayDot(0); // just once per weld cyclus
 }
 
 int BCDswitch()
@@ -41,18 +35,11 @@ void pulseWeld(int ms)
 }
 
 void weld(bool b) 
-{
-  if (b)
-     menu.displayDot(1); // Indicates thyristors are on
-  else
-     menu.displayDot(0); // Indicates thyristors are off
-  
-  if (b && !PrevWeld && !sinMaxDisabled) // If it is the first weld button press,
-     sinusMax();                       //  waits for voltage sinus max
-     
+{ if(b) menu.displayDot(1); // Indicates thyristors are on 
+  else menu.displayDot(0); // Indicates thyristors are off  
+  if (b && !PrevWeld && !sinMaxDisabled) sinusMax(); // If first weld button press, wait on sinus max     
   digitalWrite(weldPin, b);
-  digitalWrite(ledPin, !b);
-  
+  digitalWrite(ledPin, !b);  
   PrevWeld = b;
 }
 
@@ -112,9 +99,9 @@ void TFTinit()
   tft.setFont(Terminal12x16);
 }
 
-// Detects if old (no LCD) or new (with LCD) PCB is being used
+// Detects if a PCB with or without LCD is being used
 bool TFTusedJumper()  
-{ pinMode(tftJumperOutPin, OUTPUT); // Defines this pin as bein an output
+{ pinMode(tftJumperOutPin, OUTPUT); // Defines this pin as being an output
   pinMode(tftJumperInPin, INPUT_PULLUP); // Defines this pin as being an input with a pull-up resistor
   digitalWrite(tftJumperOutPin, 0);
   return !digitalRead(tftJumperInPin); // no jumper = 1 (compatible with old software)
@@ -125,13 +112,11 @@ void printValuesToSerial()
    << menuItems[2].upDownVal << "ms, continuously " << continuously << endl;
 }
 
-// LCD Orientation can only be either 0 or 2
 void setOrientation()
 { pollAll(); // works without too
   if(upButton.on() && downButton.on()) 
-  { if(eeprom.readInt(orientation)==0) eeprom.writeInt(orientation, 2); 
+  { if(eeprom.readInt(orientation)==0) eeprom.writeInt(orientation, 2); // LCD Orientation can only be either 0 or 2
     else eeprom.writeInt(orientation, 0); 
   }
 }
-
 
