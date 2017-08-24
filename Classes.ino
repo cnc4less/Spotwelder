@@ -64,7 +64,6 @@ void Menu::displayAll()
 }
 
 void Menu::displayDot(bool on)
-// { tft.fillCircle(87, 170, 12, on? COLOR_WHITE : COLOR_DARKBLUE); 
 { tft.fillCircle(87, 170, 12, on? COLOR_RED : COLOR_DARKGREEN); 
 }
 
@@ -86,12 +85,12 @@ value(value), step(step), minValue(minValue), maxValue(maxValue)
 }
 int UpDownValue::up() 
 { value += step;       
-  // return value = min(max(value, minValue), maxValue);
+  // return value = min(max(value, minValue), maxValue); // stops at end
   return value = (value > maxValue) ?  minValue : value;
 }
 int UpDownValue::down() 
 { value -= step;       
-  // return value = min(max(value, minValue), maxValue);
+  // return value = min(max(value, minValue), maxValue); // stops at end
   return value = (value < minValue ) ?  maxValue : value;
 }
 
@@ -105,5 +104,4 @@ MenuItem::MenuItem(String name, UpDownValue value):
 name(name), upDownVal(value)
 {  
 }
-
 
