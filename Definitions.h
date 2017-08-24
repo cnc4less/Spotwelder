@@ -22,8 +22,7 @@ const byte TFT_CSpin = 5;
 //const byte TFT_SDIpin = 11; // for SW SDI, doesn't work
 
 const int step_ms = 50;
-// const int sinusMax_us = 4583;
-const int sinusMax_us = 5000;
+const int sinusMax_us = 4583; // for 50Hz and 60Hz
 
 #define TXT_COLOR COLOR_YELLOW
 #define TXT_COLOR1 COLOR_SNOW
