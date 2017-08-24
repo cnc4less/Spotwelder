@@ -1,6 +1,5 @@
 // Warning, set sinMaxDisabled = 0 for the production firmware
-//bool sinMaxDisabled = 0; 
-bool sinMaxDisabled = 1; // Set this for testing without transformer
+bool sinMaxDisabled = 0; // Set this 0 for testing without transformer
 
 /* 
 Note: use the latest Arduino software and install the libraries.
@@ -27,7 +26,7 @@ weld       __________________|             |____
 
 T   = 1/(4*50Hz) = 5000us 
 T   = 1/(4*60Hz) = 4167us
-Average time = (5000us + 4167us)/2 = 4583us 
+Average time sinusMax_us = (5000us + 4167us)/2 = 4583us, this does not have to be exact
 */
 
 #include <Arduino.h>
@@ -40,6 +39,8 @@ Average time = (5000us + 4167us)/2 = 4583us
 #include "Definitions.h"
 #include "Classes.h"
 #include "Eeprom.h"
+
+String version = "Version 6.2";
 
 Switch weldButton(weldButtonPin);
 Switch upButton(upButtonPin);
@@ -76,7 +77,11 @@ void setup()
   digitalWrite(ledPin, 1); // power on indication   
   selectContinuously();  
   printValuesToSerial();
-  if(TFTused) menu.displayAll();
+  if(TFTused)
+  { menu.displayName(0, version);
+    delay(500);
+    menu.displayAll();
+  }
 }
   
 void loop() 
