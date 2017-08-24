@@ -1,7 +1,6 @@
-
 // Warning, set sinMaxDisabled = 0 for the production firmware
-bool sinMaxDisabled = 0; // Use this for the final product
-// bool sinMaxDisabled = 1; // Use this for testing without transformer
+//bool sinMaxDisabled = 0; 
+bool sinMaxDisabled = 1; // Set this for testing without transformer
 
 /* 
 Note: use the latest Arduino software and install the libraries.
@@ -25,11 +24,10 @@ Program with FTDI programmer, Extra > Board > Arduino Uno
 zeroCross   __|     |_____|     |_____|     |__                 
                               _____________           
 weld       __________________|             |____                                              
-T   = 1/50Hz = 20ms
-T/4 = 5 ms, 5e-3*16e6Hz = 80000 cc
 
-T   = 1/60Hz = 16.667ms
-T/4 = 4.1667 ms, 4.1667e-3*16e6Hz = 66666.67 cc
+T   = 1/(4*50Hz) = 5000us 
+T   = 1/(4*60Hz) = 4167us
+Average time = (5000us + 4167us)/2 = 4583us 
 */
 
 #include <Arduino.h>
@@ -50,7 +48,7 @@ Switch selectButton(selectButtonPin);
 TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RSTpin, TFT_RSpin, TFT_CSpin, 0); // hardware SPI
 // Defines the main menu entry names/items
 MenuItem preweldTimeItem = MenuItem("Preweld, ms", UpDownValue(50, 50, 0, 1000)); // value, step, minValue, maxValue
-MenuItem pauseTimeItem = MenuItem("Pause, ms", UpDownValue(100, 50, 0, 1000));
+MenuItem pauseTimeItem = MenuItem("Pause, ms", UpDownValue(500, 50, 0, 1000)); 
 MenuItem weldTimeItem = MenuItem("Weld time, ms", UpDownValue(250, 50, 50, 1000));
 MenuItem menuItems[] = {preweldTimeItem, pauseTimeItem, weldTimeItem};
 UpDownValue upDownItemNr = UpDownValue(0, 1, 0, 2); // 3 items 0 1 2 
@@ -67,11 +65,14 @@ void setup()
   eeprom.init();
   eeprom.read(); 
   setpinModes();
-  TFTused = TFTusedJumper();
-  // eeprom.writeInt(orientation, 2); // <-------------------------------
-  setOrientation(); // after eeprom.init()
+  // eeprom.writeInt(orientation, 2); / for new PCB with TFT 
+
+  // For old PCB with or without TFT:
+  TFTused = TFTusedJumper();  
+  setOrientation(); // do after eeprom.init()  
   if(TFTused) TFTinit();
-  if(!TFTused) blinkLed(4);  // This code can be removed if new PCB is used
+  if(!TFTused) blinkLed(4); 
+
   digitalWrite(ledPin, 1); // power on indication   
   selectContinuously();  
   printValuesToSerial();
@@ -86,5 +87,3 @@ void loop()
   } else 
   weldControlNoTFT();
 }
-
-
