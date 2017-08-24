@@ -42,7 +42,10 @@ void Menu::control()
 }
 
 void Menu::displayAll() 
-{ if(!continuously)
+{ displayName(0, version);
+  delay(500);
+  
+  if(!continuously)
   { for(int i=0; i<3; i++)
     { upDownItemNr.value=i;
       displayName(upDownItemNr, menuItems[upDownItemNr].name); 
@@ -62,7 +65,7 @@ void Menu::displayAll()
     drawColorTextLine(10, 0, "           Weld", COLOR_YELLOW, COLOR_BLUEVIOLET);
   }
 }
-
+ 
 void Menu::displayDot(bool on)
 { tft.fillCircle(87, 170, 12, on? COLOR_RED : COLOR_DARKGREEN); 
 }
@@ -83,11 +86,13 @@ UpDownValue::UpDownValue(int value, int step, int minValue, int maxValue):
 value(value), step(step), minValue(minValue), maxValue(maxValue)
 {
 }
+
 int UpDownValue::up() 
 { value += step;       
   // return value = min(max(value, minValue), maxValue); // stops at end
   return value = (value > maxValue) ?  minValue : value;
 }
+
 int UpDownValue::down() 
 { value -= step;       
   // return value = min(max(value, minValue), maxValue); // stops at end
