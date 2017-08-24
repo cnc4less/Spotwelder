@@ -35,12 +35,11 @@ void pulseWeld(int ms)
 }
 
 void weld(bool b) 
-{ if(b) menu.displayDot(1); // Indicates thyristors are on 
-  else menu.displayDot(0); // Indicates thyristors are off  
-  if (b && !PrevWeld && !sinMaxDisabled) sinusMax(); // If first weld button press, wait on sinus max     
+{ menu.displayDot(b);
+ // if (b && !PrevWeld && !sinMaxDisabled) sinusMax(); // If first weld button press, wait on sinus max 
   digitalWrite(weldPin, b);
   digitalWrite(ledPin, !b);  
-  PrevWeld = b;
+  //PrevWeld = b;
 }
 
 void sinusMax()
