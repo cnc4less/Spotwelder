@@ -1,34 +1,22 @@
-void weldControlNoTFT()
-{ if(continuously && BCDswitch()==0) weld(weldButton.on()); // continuous welding
-  else
-  if(weldButton.pushed()) weldCyclus(BCDswitch() * step_ms); 
-}
-
-void weldControlTFT()
-{ if(continuously) weld(weldButton.on());
-  else
-  if(weldButton.pushed()) weldCyclus(menuItems[2].upDownVal); 
+void weldControl()
+{ if(continuously) weldContinuously();
+  else if(weldButton.pushed()) weldCyclus(menuItems[2].upDownVal); 
 }
   
 void weldCyclus(int weldTime_ms)
-{ if(!sinMaxDisabled) sinusMax();
-  pulseWeld(menuItems[0].upDownVal);
+{ pulseWeld(menuItems[0].upDownVal);
   delay(menuItems[1].upDownVal);
-  if(!sinMaxDisabled) sinusMax();
   pulseWeld(weldTime_ms);
 }
 
-int BCDswitch()
-{ int bcd;
-  bitWrite(bcd, 0, !digitalRead(BCDswitch0pin));
-  bitWrite(bcd, 1, !digitalRead(BCDswitch1pin));
-  bitWrite(bcd, 2, !digitalRead(BCDswitch2pin));
-  bitWrite(bcd, 3, !digitalRead(BCDswitch3pin));
-  return bcd;
+void weldContinuously()
+{ if(weldButton.pushed()) sinusMax(); // do only once
+  weld(weldButton.on());
 }
 
 void pulseWeld(int ms)
-{ weld(1);
+{ sinusMax();
+  weld(1);
   delay(ms); 
   weld(0);
   if(printValuesToSerial) Serial << ms << endl;  
@@ -36,36 +24,21 @@ void pulseWeld(int ms)
 
 void weld(bool b) 
 { menu.displayDot(b);
- // if (b && !PrevWeld && !sinMaxDisabled) sinusMax(); // If first weld button press, wait on sinus max 
   digitalWrite(weldPin, b);
-  digitalWrite(ledPin, !b);  
-  //PrevWeld = b;
+  if(b)Serial << "w "; 
 }
 
 void sinusMax()
-{ while(digitalRead(zeroCrossPin));
+{ Serial << "sinusMax "; 
+  if(sinMaxDisabled) return;
+  while(digitalRead(zeroCrossPin));
   while(!digitalRead(zeroCrossPin));
-  delayMicroseconds(sinusMax_us); // to prevent inrush current, turn-on at the sinus max 
-}
-
-void blinkLed(int n)
-{ pinMode(ledPin, OUTPUT); 
-  for(byte i=0; i<n; i++)
-  { digitalWrite(ledPin, HIGH);   
-    delay(200);                 
-    digitalWrite(ledPin, LOW);   
-    delay(200);
-  }
+  delayMicroseconds(sinusMax_us); // prevent high inrush current, turn-on at the sinus max 
 }
 
 void setpinModes()
-{ pinMode(BCDswitch0pin, INPUT_PULLUP);
-  pinMode(BCDswitch1pin, INPUT_PULLUP);
-  pinMode(BCDswitch2pin, INPUT_PULLUP);
-  pinMode(BCDswitch3pin, INPUT_PULLUP); 
-  pinMode(weldButtonPin, INPUT_PULLUP);   
+{ pinMode(weldButtonPin, INPUT_PULLUP);   
   pinMode(weldPin, OUTPUT);
-  pinMode(ledPin, OUTPUT);
   pinMode(zeroCrossPin, INPUT);
 }
 
@@ -82,28 +55,18 @@ void selectContinuously()
   unsigned long start_ms = millis();
   pollAll();
   delay(switchStable_ms);
-  int bcdswitch = BCDswitch();  
   
   while(weldButton.on())
   { pollAll();     
     if(!weldButton.on()) break;
   }
   if(millis()-start_ms > weldButtonPressTime) continuously = 1;
-  if(!TFTused) continuously &= bcdswitch==0; // bcdswitch has to be at position 0 too
 }
 
 void TFTinit()
 { tft.begin();
   tft.setOrientation(eeprom.readInt(orientation)); 
   tft.setFont(Terminal12x16);
-}
-
-// Detects if a PCB with or without LCD is being used
-bool TFTusedJumper()  
-{ pinMode(tftJumperOutPin, OUTPUT); // Defines this pin as being an output
-  pinMode(tftJumperInPin, INPUT_PULLUP); // Defines this pin as being an input with a pull-up resistor
-  digitalWrite(tftJumperOutPin, 0);
-  return !digitalRead(tftJumperInPin); // no jumper = 1 (compatible with old software)
 }
 
 void printValuesToSerial()
@@ -118,4 +81,5 @@ void setOrientation()
     else eeprom.writeInt(orientation, 0); 
   }
 }
+
 

@@ -54,15 +54,13 @@ void Menu::displayAll()
     upDownItemNr.value = 0;
     menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 1, 0); // item 0 has focus
     displayDot(0); 
-    drawColorTextLine(10, 0, "-   +   sel   weld", COLOR_YELLOW, COLOR_BLUEVIOLET);
-    // drawColorTextLine(10, 0, "Weld Sel Up Down", COLOR_YELLOW, COLOR_BLUEVIOLET);
-  }
+    drawColorTextLine(10, 0, "-   +   sel   weld", COLOR_YELLOW, COLOR_BLUEVIOLET); // todo no weld button text
+   }
   else 
   { drawColorTextLine(4, 0, "  Continuously", COLOR_WHITE, COLOR_RED);
     drawColorTextLine(5, 0, "        mode", COLOR_WHITE, COLOR_RED);
     drawColorTextLine(6, 0, "    Take care!", COLOR_WHITE, COLOR_RED);
-    // drawColorTextLine(10, 0, "Weld           ", COLOR_YELLOW, COLOR_BLUEVIOLET);
-    drawColorTextLine(10, 0, "           Weld", COLOR_YELLOW, COLOR_BLUEVIOLET);
+    drawColorTextLine(10, 0, "           Weld", COLOR_YELLOW, COLOR_BLUEVIOLET); // todo no weld button text
   }
 }
  
@@ -89,13 +87,11 @@ value(value), step(step), minValue(minValue), maxValue(maxValue)
 
 int UpDownValue::up() 
 { value += step;       
-  // return value = min(max(value, minValue), maxValue); // stops at end
   return value = (value > maxValue) ?  minValue : value;
 }
 
 int UpDownValue::down() 
 { value -= step;       
-  // return value = min(max(value, minValue), maxValue); // stops at end
   return value = (value < minValue ) ?  maxValue : value;
 }
 
@@ -109,4 +105,5 @@ MenuItem::MenuItem(String name, UpDownValue value):
 name(name), upDownVal(value)
 {  
 }
+
 
