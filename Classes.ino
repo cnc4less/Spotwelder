@@ -1,81 +1,91 @@
 #include "Classes.h"
 #include <Arduino.h>
 
-void Menu::drawColorTextLine(int line, int left, String str, uint16_t color=COLOR_WHITE, uint16_t backgroundColor) 
-{ tft.fillRectangle(left, 20*line, 175, 20*line+19, backgroundColor); // line <= 10
-  tft.setBackgroundColor(backgroundColor);
-  tft.drawText(left, 20*line+2, str, color);  
-}
-
 void Menu::control() 
-{ if(!editValue)
+{ if(!editValueMode)
   { if(upButton.pushed()) 
-    { menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 0, editValue); // un-focus old item
-      menu.displayValue(upDownItemNr, menuItems[upDownItemNr.down()].upDownVal, 1, editValue); // focus
+    { displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal, 0, editValueMode); // un-focus old item
+      displayValue(WeldItemNr, menuItems[WeldItemNr.down()].upDownVal, 1, editValueMode); // focus
       return;
     } 
     if(downButton.pushed()) 
-    { menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 0, editValue); // un-focus old item
-      menu.displayValue(upDownItemNr, menuItems[upDownItemNr.up()].upDownVal, 1, editValue); // focus
+    { displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal, 0, editValueMode); // un-focus old item
+      displayValue(WeldItemNr, menuItems[WeldItemNr.up()].upDownVal, 1, editValueMode); // focus
       return;
     } 
     if(selectButton.pushed())
-    { menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 1, editValue=1); // add backgound
+    { displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal, 1, editValueMode=1); // add backgound
       return;
     }
-  }     
-  if(editValue)
+  }   
+    
+  if(editValueMode)
   { if(upButton.pushed()) 
-    { menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal.up(), 1, editValue); 
+    { displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal.up(), 1, editValueMode); 
       return;     
     }
     if(downButton.pushed()) 
-    { menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal.down(), 1, editValue); 
+    { displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal.down(), 1, editValueMode); 
       return;    
     } 
     if(selectButton.pushed()) 
-    { menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 1, editValue=0); // delete backgound
+    { displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal, 1, editValueMode=0); // delete backgound
       eeprom.write();
       return;
     }      
   }
 }
 
-void Menu::displayAll() 
-{ displayName(0, version);
-  delay(500);
-  
+void Menu::displayStart() 
+{ drawColorTextLine(0, textLeft, version, TFT_YELLOW);
+  delay(1000);
+  TFTinit();
+ 
   if(!continuously)
   { for(int i=0; i<3; i++)
-    { upDownItemNr.value=i;
-      displayName(upDownItemNr, menuItems[upDownItemNr].name); 
-      menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 0, 0);
-     } 
-    upDownItemNr.value = 0;
-    menu.displayValue(upDownItemNr, menuItems[upDownItemNr].upDownVal, 1, 0); // item 0 has focus
+    { WeldItemNr.value=i;
+      displayName(WeldItemNr, menuItems[WeldItemNr].name); 
+      displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal, 0, 0);
+    } 
+    WeldItemNr.value = 0;
+    displayValue(WeldItemNr, menuItems[WeldItemNr].upDownVal, 1, 0); // item 0 has focus
     displayDot(0); 
-    drawColorTextLine(10, 0, "-   +   sel   weld", COLOR_YELLOW, COLOR_BLUEVIOLET); // todo no weld button text
-   }
-  else 
-  { drawColorTextLine(4, 0, "  Continuously", COLOR_WHITE, COLOR_RED);
-    drawColorTextLine(5, 0, "        mode", COLOR_WHITE, COLOR_RED);
-    drawColorTextLine(6, 0, "    Take care!", COLOR_WHITE, COLOR_RED);
-    drawColorTextLine(10, 0, "           Weld", COLOR_YELLOW, COLOR_BLUEVIOLET); // todo no weld button text
+    drawColorTextLine(8, 0, "   down           up                sel                    ", TFT_YELLOW, TFT_BLUE); // to long text is ok
   }
+  else displayContinuously();
 }
- 
+
+void Menu::displayContinuously()
+{ tft.fillScreen(TFT_RED);
+  drawColorTextLine(2, 0, "                 Continuously", TFT_WHITE, TFT_RED);
+  drawColorTextLine(3, 0, "                         mode", TFT_WHITE, TFT_RED);
+  drawColorTextLine(4, 0, "                    Take care!", TFT_WHITE, TFT_RED);
+  displayDot(0);
+}
+
 void Menu::displayDot(bool on)
-{ tft.fillCircle(87, 170, 12, on? COLOR_RED : COLOR_DARKGREEN); 
+{ tft.fillCircle(148, 180, 20, on? TFT_WHITE : 0x64A7/*green*/); // https://ee-programming-notepad.blogspot.nl/2016/10/16-bit-color-generator-picker.html
 }
 
-void Menu::displayName(int upDownItemNr, String &name) 
-{ drawColorTextLine(2*upDownItemNr, txtLeft, name, TXT_COLOR);
+void Menu::drawColorTextLine(int line, int left, String str, uint16_t textColor, uint16_t backgroundColor) 
+{ tft.setTextColor(textColor, backgroundColor);
+  tft.drawString(str.c_str(), left, fontHeight*line+vertOffset, fontSize); 
 }
 
-void Menu::displayValue(int upDownItemNr, int value, bool focus, bool background)
-{ menu.drawColorTextLine(2*upDownItemNr+1, txtLeft, String("      ")); // clear line
-  menu.drawColorTextLine(2*upDownItemNr+1, 0, focus? ">" : " ", TXT_COLOR1);
-  menu.drawColorTextLine(2*upDownItemNr+1, txtLeft, String(value), background? COLOR_BLACK : TXT_COLOR1, background? COLOR_CYAN : COLOR_BLACK);
+void Menu::displayName(int WeldItemNr, String &name) 
+{ drawColorTextLine(2*WeldItemNr, textLeft, name, TFT_YELLOW);
+}
+
+void Menu::displayValue(int WeldItemNr, int value, bool focus, bool edit) 
+{ drawColorTextLine(2*WeldItemNr+1, textLeft, "                  ", TFT_WHITE); // clear line, can't be BLACK (bug?)
+  drawColorTextLine(2*WeldItemNr+1, 0, ">", focus? TFT_WHITE : TFT_BLACK); // BLACK on BLACK = BLACK
+  drawColorTextLine(2*WeldItemNr+1, textLeft, String(value), edit? TFT_BLACK : TFT_WHITE, edit? TFT_CYAN : TFT_BLACK);
+}
+
+void Menu::TFTinit()
+{ tft.init();
+  tft.setRotation(orientation);
+  tft.fillScreen(TFT_BLACK);
 }
 
 // ---------------------------------------------------------------------------
@@ -105,5 +115,15 @@ MenuItem::MenuItem(String name, UpDownValue value):
 name(name), upDownVal(value)
 {  
 }
+
+/*
+  if(downButton.on() && selectButton.on())
+  { preferencesControl();
+    return;
+  } 
+  
+  drawColorTextLine(2, textLeft, "Set preferences:", TFT_YELLOW);
+  drawColorTextLine(3, textLeft, "press down + sel", TFT_YELLOW);
+*/
 
 
