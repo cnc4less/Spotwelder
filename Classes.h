@@ -27,16 +27,20 @@ class MenuItem
 
 class Menu
 { public:
+    void displayStart();
     void control();
-    void displayAll();
-    void displayName(int itemNr, String &name);
-    void displayValue(int itemNr, int value, bool focus, bool background);
     void displayDot(bool on);
-    void drawColorTextLine(int line, int left, String str, uint16_t color=COLOR_WHITE, uint16_t backgroundColor=COLOR_BLACK);
-  
+    void TFTinit();
+     
   private:
-    bool editValue=0;
-    const int txtLeft = 17;
+    void displayName(int itemNr, String &name);
+    void displayValue(int itemNr, int value, bool focus, bool edit);
+    void drawColorTextLine(int line, int left, String str, uint16_t textColor=TFT_WHITE, uint16_t backgroundColor=TFT_BLACK); // line 0..8
+    void displayContinuously();
+
+    bool editValueMode=0;
+    const int textLeft = 20, fontSize=4, fontHeight=26; 
+    const int vertOffset=3; // 240-9*26)/2
 };
 
 #endif
